@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-// models
+import 'package:provider/provider.dart';
 import '../models/product.dart';
-
-// services
+import '../services/cart_service.dart';
 import '../services/product_service.dart';
-
-// widgets
 import '../widgets/custom_text.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -132,6 +128,42 @@ class _ProductScreenState extends State<ProductScreen> {
                       CustomText(
                         text: product.description,
                         fontSize: 14.sp,
+                      ),
+                      SizedBox(height: 16.h),
+                      // ENHANCEMENT 3: Add to cart by passing product id and quantity.
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            try {
+                              await context
+                                  .read<CartService>()
+                                  .addProductToCart(product);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${product.title} added to cart',
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error: $e')),
+                                );
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.add_shopping_cart),
+                          label: CustomText(
+                            text: 'Add to Cart',
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
