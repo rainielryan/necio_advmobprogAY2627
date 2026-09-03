@@ -20,3 +20,7 @@ This activity introduces a layered Model–Service–UI design pattern based on 
 
 In this activity, the Cart model, CartService, and CartScreen work together to render one user’s cart from the API, and tapping an item opens the shared detail_screen. The Cart model converts JSON into Dart objects, while CartService reads HOST and USER_ID from .env and uses a get-by-id style call, GET /carts/user/:id, so only that user’s cart is loaded instead of every cart. CartScreen then displays those items through Provider, and a tap reuses DetailScreen to show the selected product’s price, quantity, and discount. This updates the Model–Service–UI pattern by sharing one detail screen across routes and keeping cart state in the service, so fetching by id, adding to cart, and showing details stay separate from the UI.
 
+## Lab Activity 4: discussion
+
+In this activity, the User model, UserService, and ProfileScreen work together to show the logged-in account after the login API runs. UserService posts credentials to /auth/login, maps the JSON into a User model, and saves that user in SharedPreferences, then ProfileScreen reads getUser() and only displays the name, email, gender, and id. This updates the Model–Service–UI pattern by adding a session layer: splash checks isLoggedIn(), sign-in persists the user, and profile renders saved data instead of calling the API again. CartScreen uses that saved user id so CartService can call GET /carts/user/:id and POST /carts/add for the same person, which keeps the cart tied to the logged-in user instead of a hardcoded id.
+

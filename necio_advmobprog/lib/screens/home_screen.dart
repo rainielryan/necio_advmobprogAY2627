@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'cart_screen.dart';
 import 'product_screen.dart';
+import 'profile_screen.dart';
+import '../services/user_service.dart';
 import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,9 +18,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool _showChat = false;
+  String _firstName = 'Profile';
   final PageController _pageController = PageController();
 
   static const int _cartIndex = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    UserService().getUser().then((user) {
+      if (!mounted) return;
+      setState(() {
+        _firstName = user.firstName.isNotEmpty ? user.firstName : 'Profile';
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       : (_selectedIndex == _cartIndex)
                           ? 'Cart'
                           : (_selectedIndex == 2)
-                              ? 'Profile'
+                              ? _firstName
                               : 'Home',
                   fontSize: 20.sp,
                   // color: FB_LIGHT_PRIMARY,
@@ -72,13 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: const <Widget>[
                   ProductScreen(),
                   CartScreen(showAppBar: false),
-                  Center(
-                    child: CustomText(
-                      text: 'Profile',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  // ENHANCEMENT 3: Profile tab renders the saved User model.
+                  ProfileScreen(),
                 ],
                 onPageChanged: (page) {
                   setState(() {
@@ -92,12 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
         floatingActionButton: _selectedIndex == _cartIndex
             ? null
             : FloatingActionButton(
+                backgroundColor: const Color(0xFFFFD54F),
                 onPressed: () {
                   setState(() {
                     _showChat = true;
                   });
                 },
-                child: const Icon(Icons.chat),
+                child: const Icon(Icons.chat, color: Colors.black),
               ),
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false, //selected item

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
 import '../models/cart.dart';
@@ -20,16 +21,22 @@ class CartService extends ChangeNotifier {
   double get subtotal => _cart?.total ?? 0;
   double get discountedTotal => _cart?.discountedTotal ?? 0;
 
-  Cart _emptyCart() {
+  Cart _emptyCart([int? userId]) {
     return Cart(
       id: 0,
       products: const [],
       total: 0,
       discountedTotal: 0,
-      userId: cartUserId,
+      userId: userId ?? cartUserId,
       totalProducts: 0,
       totalQuantity: 0,
     );
+  }
+
+  // ENHANCEMENT 3: Use the saved logged-in user's id for the cart.
+  Future<int> _savedUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id') ?? cartUserId;
   }
 
   Future<List<Cart>> getAllCarts() async {
@@ -52,7 +59,7 @@ class CartService extends ChangeNotifier {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List cartsJson = data['carts'] ?? [];
       if (cartsJson.isEmpty) {
-        return _emptyCart();
+        return _emptyCart(userId);
       }
       return Cart.fromJson(cartsJson.first);
     }
@@ -66,7 +73,8 @@ class CartService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _cart = await getCartByUserId(cartUserId);
+      final userId = await _savedUserId();
+      _cart = await getCartByUserId(userId);
     } catch (e) {
       _error = e.toString();
       _cart = _emptyCart();
@@ -116,11 +124,12 @@ class CartService extends ChangeNotifier {
   }
 
   Future<void> _submitCart(List<Map<String, int>> products) async {
+    final userId = await _savedUserId();
     final response = await http.post(
       Uri.parse('$host/carts/add'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'userId': cartUserId,
+        'userId': userId,
         'products': products,
       }),
     );
