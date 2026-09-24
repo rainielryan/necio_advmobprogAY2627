@@ -34,9 +34,12 @@ class CartService extends ChangeNotifier {
   }
 
   // ENHANCEMENT 3: Use the saved logged-in user's id for the cart.
-  Future<int> _savedUserId() async {
+  // Firebase accounts have no DummyJSON id, so 0 must not be sent to /carts/user/0.
+  Future<int?> _savedUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('id') ?? cartUserId;
+    final id = prefs.getInt('id') ?? 0;
+    if (id <= 0) return null;
+    return id;
   }
 
   Future<List<Cart>> getAllCarts() async {
@@ -74,9 +77,13 @@ class CartService extends ChangeNotifier {
 
     try {
       final userId = await _savedUserId();
-      _cart = await getCartByUserId(userId);
+      if (userId == null) {
+        _cart = _emptyCart(0);
+      } else {
+        _cart = await getCartByUserId(userId);
+      }
     } catch (e) {
-      _error = e.toString();
+      _error = 'Could not load the cart. Check your connection and try again.';
       _cart = _emptyCart();
     }
 
@@ -124,7 +131,7 @@ class CartService extends ChangeNotifier {
   }
 
   Future<void> _submitCart(List<Map<String, int>> products) async {
-    final userId = await _savedUserId();
+    final userId = await _savedUserId() ?? cartUserId;
     final response = await http.post(
       Uri.parse('$host/carts/add'),
       headers: {'Content-Type': 'application/json'},

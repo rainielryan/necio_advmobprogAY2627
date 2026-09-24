@@ -1,4 +1,5 @@
 // packages
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,6 +11,7 @@ import 'screens/cart_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/signin_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/splash_screen.dart';
 
 // providers
@@ -18,6 +20,8 @@ import 'providers/theme_provider.dart';
 // services
 import 'services/cart_service.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -25,6 +29,10 @@ void main() async {
   (
     _,
   ) async {
+    // LAB ACTIVITY 5: Initialize Firebase before runApp.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await dotenv.load(fileName: 'assets/.env');
     runApp(const RoblesAdvMobProg());
   });
@@ -56,6 +64,7 @@ class RoblesAdvMobProg extends StatelessWidget {
             routes: {
               '/splash': (context) => const SplashScreen(),
               '/signin': (context) => const SignInScreen(),
+              '/signup': (context) => const SignupScreen(),
               '/home': (context) => const HomeScreen(),
               // ENHANCEMENT 1: Route to cart_screen to render the carts API endpoint.
               '/cart': (context) => const CartScreen(),

@@ -44,12 +44,15 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       final userService = UserService();
       final cartService = context.read<CartService>();
-      final response = await userService.loginUser(
-        _usernameController.text.trim(),
-        _passwordController.text,
-      );
-      // Save user data to SharedPreferences
-      await userService.saveUserData(response);
+      final identifier = _usernameController.text.trim();
+      final password = _passwordController.text;
+
+      if (identifier.contains('@')) {
+        await userService.signIn(email: identifier, password: password);
+        await userService.saveFirebaseSession();
+      } else {
+        await userService.loginUser(identifier, password);
+      }
       await cartService.loadUserCart();
       if (!mounted) return;
       setState(() {
@@ -115,10 +118,10 @@ class _SignInScreenState extends State<SignInScreen> {
                 SizedBox(height: 48.h),
                 TextFormField(
                   controller: _usernameController,
-                  decoration: _fieldDecoration('Username'),
+                  decoration: _fieldDecoration('Username or Email'),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Username is required';
+                      return 'Username or email is required';
                     }
                     return null;
                   },
@@ -164,6 +167,17 @@ class _SignInScreenState extends State<SignInScreen> {
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => Navigator.pushNamed(context, '/signup'),
+                  child: CustomText(
+                    text: "Don't have an account? Sign up",
+                    fontSize: 14.sp,
+                    color: _navy,
                   ),
                 ),
               ],

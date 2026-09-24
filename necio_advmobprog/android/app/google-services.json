@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "117430811860",
+    "project_id": "advmobprog-firebase-410be",
+    "storage_bucket": "advmobprog-firebase-410be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117430811860:android:71fd4961658b79e2254f41",
+        "android_client_info": {
+          "package_name": "com.example.necio_advmobprog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeaPJwBcdGKTrC9DODkPRzLWG0UIishto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
