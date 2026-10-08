@@ -68,7 +68,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.dispose();
+    });
 
     if (username == null || username.isEmpty) return;
 
@@ -141,8 +143,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     final currentPassword = currentController.text;
     final newPassword = newController.text;
-    currentController.dispose();
-    newController.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      currentController.dispose();
+      newController.dispose();
+    });
 
     if (confirmed != true) return;
     if (newPassword.length < 6) {
@@ -214,7 +218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     final password = passwordController.text;
-    passwordController.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      passwordController.dispose();
+    });
 
     if (confirmed != true) return;
 

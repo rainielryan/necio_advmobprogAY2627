@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'cart_screen.dart';
+import 'chat_screen.dart';
 import 'product_screen.dart';
 import 'profile_screen.dart';
 import '../services/user_service.dart';
@@ -72,31 +73,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        body: _showChat
-            ? Center(
-                child: CustomText(
-                  text: 'Chat',
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            : PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                children: const <Widget>[
-                  ProductScreen(),
-                  CartScreen(showAppBar: false),
-                  // ENHANCEMENT 3: Profile tab renders the saved User model.
-                  ProfileScreen(),
-                ],
-                onPageChanged: (page) {
-                  setState(() {
-                    _selectedIndex = page;
-                    _showChat = false;
-                  });
-                },
-              ),
-        // ENHANCEMENT 2: Chat bottom navigation is a FloatingActionButton.
+        body: Stack(
+          children: [
+            PageView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _pageController,
+              children: const <Widget>[
+                ProductScreen(),
+                CartScreen(showAppBar: false),
+                // ENHANCEMENT 3: Profile tab renders the saved User model.
+                ProfileScreen(),
+              ],
+              onPageChanged: (page) {
+                setState(() {
+                  _selectedIndex = page;
+                  _showChat = false;
+                });
+              },
+            ),
+            if (_showChat) const Positioned.fill(child: ChatScreen()),
+          ],
+        ),
+        // ENHANCEMENT 1: FloatingActionButton opens the chat list.
         // ENHANCEMENT 2: Hide the FloatingActionButton on cart_screen.
         floatingActionButton: _selectedIndex == _cartIndex
             ? null

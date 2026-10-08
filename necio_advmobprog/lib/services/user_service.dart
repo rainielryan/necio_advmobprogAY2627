@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
 import '../models/user.dart' as models;
+import 'chat_service.dart';
 
 ValueNotifier<UserService> userService = ValueNotifier(UserService());
 
@@ -99,6 +100,7 @@ class UserService {
       'age': prefs.getInt('age') ?? 0,
       'phone': prefs.getString('phone') ?? '',
       'loginType': prefs.getString('loginType') ?? 'dummyjson',
+      'uid': prefs.getString('uid') ?? '',
     };
   }
 
@@ -206,6 +208,17 @@ class UserService {
       'accessToken': token ?? '',
       'refreshToken': firebaseUser.refreshToken ?? '',
       'loginType': 'firebase',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('uid', firebaseUser.uid);
+    await ChatService().registerUser({
+      'uid': firebaseUser.uid,
+      'email': firebaseUser.email ?? '',
+      'firstName': firstName ??
+          (existing['firstName'] != ''
+              ? existing['firstName']
+              : (saved['firstName'] ??
+                  (displayParts.isNotEmpty ? displayParts.first : ''))),
     });
   }
 
